@@ -1,28 +1,27 @@
 //Двоичные деревья поиска :
-//
-//Конструкторы(4), деструктор++, =
+//Конструкторы, деструктор, =
 //поиск узла по ключу
 //добавление узла
 //удаление узла
 //минимум и максимум
 //обход в ширину(по уровням)
-//обход в высоту(на выбор : ЛПК, КЛП, КПЛ)
-//
+//обход в высоту(на выбор : ЛПК)
 //
 //По желанию :
 //сумма ключей
 #include <stdlib.h>
 #include <iostream>
+#include <ctime>
 #include <queue>
 
 using namespace std;
 
-//класс Узел 
+//класс Узел
 class Node {
     int key;
-    Node* left; 
+    Node* left;
     Node* right;
-public:    
+public:
     //Конструктор
     Node(int k = 0, Node* l = nullptr, Node* r = nullptr) {
         key = k;
@@ -40,7 +39,7 @@ class Search_B_Tree {
     Node* delete_Node(Node* q, int k);  //удаление узла
     Node* min_Node(Node* q);            //минимальный узел
     Node* max_Node(Node* q);            //максимальный узел
-    void print(Node* q, int h);         //вывод ???
+    void print(Node* q, int h);         //вывод
     void LPK(Node* q);                  //ЛПК
     int sum_Keys(Node* q);              //сумма ключей
 public:
@@ -60,7 +59,11 @@ public:
     void LPK_traversal();                   //Обход в глубину
     int Sum();                              //Сумма ключей
     void Print();                           //Вывод дерева
+    int get_key();
 };
+int Search_B_Tree::get_key(){
+    return root->key;
+}
 Node* Search_B_Tree::copy(Node* q) {
     if (q == nullptr) {
         return nullptr;
@@ -82,23 +85,44 @@ Node* Search_B_Tree::find_Node(Node* q, int k) {
     if (q == nullptr || q->key == k) {
         return q;
     }
-    if (k < q->key) {
-        return find_Node(q->left, k);
+    Node* tmp = root;
+    while(tmp && tmp->key != k){
+        if(k < tmp->key){
+            tmp = tmp->left;
+        }
+        else{
+            tmp = tmp->right;
+        }
     }
-    return find_Node(q->right, k);
+    return tmp;
 }
 Node* Search_B_Tree::insert_Node(Node*& q, int k) {
     if (q == nullptr) {
         q = new Node(k);
         return q;
     }
-    if (k < q->key) {
-        return insert_Node(q->left, k);
+    Node* tmp = q;
+    Node* parent = nullptr;
+    while(tmp != nullptr){
+        parent = tmp;
+        if(k == tmp->key){
+            return tmp;
+        }
+        else if(k < tmp->key){
+            tmp = tmp->left;
+        }
+        else{
+            tmp = tmp->right;
+        }
     }
-    if (k > q->key) {
-        return insert_Node(q->right, k);
+    Node* newNode = new Node(k);
+    if (k < parent->key) {
+        parent->left = newNode;
     }
-    return q;
+    else {
+        parent->right = newNode;
+    }
+    return newNode;
 }
 Node* Search_B_Tree::delete_Node(Node* q, int k) {
     if (q == nullptr) {
@@ -123,7 +147,7 @@ Node* Search_B_Tree::delete_Node(Node* q, int k) {
         }
         Node* tmp = min_Node(q->right);
         q->key = tmp->key;
-        q->right = delete_Node(q->right, tmp->key);        
+        q->right = delete_Node(q->right, tmp->key);
     }
     return q;
 }
@@ -260,7 +284,7 @@ int main() {
     tree3.Print();
 
     cout << "--------------------------------------------------------------------\n";
-    
+
     int k = 5;
     for (int i = 0; i <= k; i++) {
         int n = rand() % 100;
@@ -270,7 +294,7 @@ int main() {
     cout << "Tree1 structure after insert n:" << "\n";
     tree1.Print();
 
-    cout << "--------------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------";
 
     cout << "\nIn-order traversal: ";
     tree1.level_traversal();
@@ -278,13 +302,13 @@ int main() {
     cout << "LPK traversal: ";
     tree1.LPK_traversal();
 
-    cout << "--------------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------";
 
     cout << "\nMin: " << tree1.Min() << "\n";
     cout << "Max: " << tree1.Max() << "\n";
     cout << "Sum: " << tree1.Sum() << "\n";
 
-    cout << "--------------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------";
 
     int f = rand() % 100;
     cout << "\nSearch for " << f << ":\n";
@@ -300,9 +324,10 @@ int main() {
     tree1.Insert(r);
     cout << "Tree1 structure after insert " << r << ":\n";
     tree1.Print();
-    tree1.Remove(r);
-    cout << "\nAfter removing " << r << ":\n";
+
+    tree1.Remove(tree1.get_key());
+    cout << "After removing "<<":\n";
     tree1.Print();
-    
+
     return 0;
 }
